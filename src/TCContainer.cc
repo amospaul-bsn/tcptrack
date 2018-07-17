@@ -1,4 +1,4 @@
-/* 
+/*
  *  Ths code in this file is part of tcptrack. For more information see
  *    http://www.rhythm.cx/~steve/devel/tcptrack
  *
@@ -8,16 +8,16 @@
  *  under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2, or (at your
  *  option) any later version.
- *   
+ *
  *  tcptrack is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  General Public License for more details.
- *   
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with GNU Make; see the file COPYING.  If not, write to
- *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA. 
- *  
+ *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
  */
 #define _DEFAULT_SOURCE 1
 #define _BSD_SOURCE 1
@@ -61,7 +61,7 @@ TCContainer::TCContainer()
 		throw GenericError("pthread_create() failed.");
 
 	state=TSTATE_RUNNING;
-	purgeflag=true;
+	purgeflag=false;
 }
 
 // remove closed connections?
@@ -74,7 +74,7 @@ void TCContainer::purge( bool npurgeflag )
 void TCContainer::stop()
 {
 	pthread_mutex_lock(&state_mutex);
-	if( state!=TSTATE_RUNNING ) 
+	if( state!=TSTATE_RUNNING )
 	{
 		pthread_mutex_unlock(&state_mutex);
 		return;
@@ -84,7 +84,7 @@ void TCContainer::stop()
 
 	// maint thread will notice that state is no longer RUNNING and
 	// will exit. just wait for it...
-	pthread_join(maint_thread_tid,NULL);	
+	pthread_join(maint_thread_tid,NULL);
 
 	state=TSTATE_DONE;
 }
@@ -99,7 +99,7 @@ TCContainer::~TCContainer()
 		i++;
 		conhash2.erase(tmp_i);
 		collector.collect(rm);
-	} 
+	}
 }
 
 SortedIterator * TCContainer::getSortedIteratorPtr()
@@ -115,7 +115,7 @@ bool TCContainer::processPacket( TCPCapture &p )
 
 	// a SocketPair is the combination of source/dest ports and addrs.
 	// it is used as a fingerprint to identify connections.
-	SocketPair sp( p.GetPacket().srcAddr(), p.GetPacket().tcp().srcPort(), 
+	SocketPair sp( p.GetPacket().srcAddr(), p.GetPacket().tcp().srcPort(),
 			p.GetPacket().dstAddr(), p.GetPacket().tcp().dstPort() );
 
 	// iterate over all packets that match this SocketPair and see if they'll
@@ -143,7 +143,7 @@ bool TCContainer::processPacket( TCPCapture &p )
 	if( !found && app->detect )
 	{
 		TCPConnection *newcon = guesser.addPacket(p);
-		if( newcon != NULL ) 
+		if( newcon != NULL )
 			conhash2.insert(tccmap::value_type(sp,newcon));
 	}
 
@@ -187,7 +187,7 @@ void TCContainer::maint_thread_run()
 			// remove closed or stale connections.
 			if( purgeflag==true )
 			{
-				if(    ( ic->isFinished() && ic->getIdleSeconds() > app->remto ) 
+				if(    ( ic->isFinished() && ic->getIdleSeconds() > app->remto )
 						|| ( ic->getState()==TCP_STATE_SYN_SYNACK && ic->getIdleSeconds()>SYN_SYNACK_WAIT )
 						|| ( ic->getState()==TCP_STATE_FIN_FINACK && ic->getIdleSeconds()>FIN_FINACK_WAIT )
 					)
@@ -200,14 +200,14 @@ void TCContainer::maint_thread_run()
 				}
 				else
 					i++;
-			} 
+			}
 			else
 			{
 				i++;
 			}
-		} 
+		}
 
-		unlock();		
+		unlock();
 	}
 }
 
@@ -231,4 +231,3 @@ void *maint_thread_func( void * arg )
 	c->maint_thread_run();
 	return NULL;
 }
-

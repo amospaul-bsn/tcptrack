@@ -1,6 +1,6 @@
 // after a connection has been closed for this many seconds,
 // remove it
-#define CLOSED_PURGE 2
+#define CLOSED_PURGE -1
 
 // the display will be updated every DISPLAY_REFRESH nanoseconds.
 //#define DISPLAY_REFRESH 10000
@@ -10,7 +10,7 @@
 #define PKTBUF_PROC 10000
 
 // this is the amount of time pcap_loop will wait for more packets before
-// passing what it has to tcptrack. this is milliseconds. 
+// passing what it has to tcptrack. this is milliseconds.
 // This is passed to the third argument (to_ms) to pcap_open_live
 #define POL_TO_MS 10
 
@@ -21,7 +21,7 @@
 // connections in the CLOSING state are removed after this timeout
 #define FIN_FINACK_WAIT 60
 
-// pcap snaplen. Should be as long as biggest link level header len + 
+// pcap snaplen. Should be as long as biggest link level header len +
 // vlan header len + IP header len + tcp header len.
 #define SNAPLEN 100
 

@@ -63,7 +63,7 @@ void TCPTrack::run( int argc, char **argv )
 		while( TCPConnection *ic=i->getNext() )
 		{
 			string tcp_state;
-			if ((ic->getState() == TCP_STATE_CLOSED || ic->getState() == TCP_STATE_RESET)
+			if ((app->remto != CLOSED_PURGE)&&(ic->getState() == TCP_STATE_CLOSED || ic->getState() == TCP_STATE_RESET)
 					&& (time(NULL) - ic->getLastPktTimestamp() > app->remto ))
 			{
 				continue;
