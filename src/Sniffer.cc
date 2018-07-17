@@ -1,4 +1,4 @@
-/* 
+/*
  *  Ths code in this file is part of tcptrack. For more information see
  *    http://www.rhythm.cx/~steve/devel/tcptrack
  *
@@ -8,16 +8,16 @@
  *  under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2, or (at your
  *  option) any later version.
- *   
+ *
  *  tcptrack is distributed in the hope that it will be useful, but
 *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  General Public License for more details.
- *   
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with GNU Make; see the file COPYING.  If not, write to
- *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA. 
- *  
+ *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
  */
 #include "../config.h"
 #define _DEFAULT_SOURCE 1
@@ -76,18 +76,18 @@ void Sniffer::init(char *iface, char *fexp, char *test_file)
 	{
 		handle = pcap_open_offline(test_file, errbuf);
 	}
-		
+
 	if( !handle )
 		throw PcapError("pcap_open_live",errbuf);
-	
+
 	dlt = pcap_datalink(handle);
-	if( dlt!=DLT_EN10MB  &&  dlt!=DLT_LINUX_SLL && dlt!=DLT_RAW && dlt!=DLT_NULL) 
+	if( dlt!=DLT_EN10MB  &&  dlt!=DLT_LINUX_SLL && dlt!=DLT_RAW && dlt!=DLT_NULL)
 		throw GenericError("The specified interface type is not supported yet.");
 	//if( dlt==DLT_LINUX_SLL )
 	//	cerr << "this is a LINUX_SLL interface\n";
 
 	//
-	// prepare the filter	
+	// prepare the filter
 	//
 	struct bpf_program filter; // the filter for the sniffer
 	char *filter_app = fexp;  // The filter expression
@@ -95,7 +95,7 @@ void Sniffer::init(char *iface, char *fexp, char *test_file)
 	bpf_u_int32 net;    // The IP of our sniffing device
 	if( pcap_lookupnet(iface, &net, &mask, errbuf) == -1 )
 	{
-		// TODO: should this ever be fatal? 
+		// TODO: should this ever be fatal?
 		//       it never is in tcpdump.
 		//pcap_close(handle);
 		//throw PcapError("pcap_lookupnet",errbuf);
@@ -114,7 +114,7 @@ void Sniffer::init(char *iface, char *fexp, char *test_file)
 		throw PcapError("pcap_setfilter",pcap_geterr(handle));
 	}
 	pcap_freecode(&filter); // filter code not needed after setfilter
-	
+
 	pcap_initted=true;
 
 
@@ -133,7 +133,7 @@ void Sniffer::init(char *iface, char *fexp, char *test_file)
 
 Sniffer::~Sniffer()
 {
-	if( pthread_initted ) 
+	if( pthread_initted )
 	{
 		// if pthread_cancel returns non-zero, this indicates that
 		// sniffer_tid is not valid. It may have stopped because of
@@ -158,14 +158,16 @@ void Sniffer::run()
 
 	// Kill the program when the loop ends.
 	// We return 0 so the fuzz tester can tell the difference between a good run and a crash
-	exit(0);
+	/* Do not exit, call stop() */
+	//exit(0);
+	app->shutdown();
 }
 
 void Sniffer::processPacket( const pcap_pkthdr *header, const u_char *packet )
 {
 	assert( pthread_mutex_lock(&pb_mutex)==0 );
 
-	if( pb==NULL ) 
+	if( pb==NULL )
 	{
 		assert( pthread_mutex_unlock(&pb_mutex) == 0 );
 		return;
@@ -179,7 +181,7 @@ void Sniffer::processPacket( const pcap_pkthdr *header, const u_char *packet )
 		assert( pthread_mutex_unlock(&pb_mutex) == 0 );
 		return;
 	}
-	
+
 	if( ! checknlp(n) )
 	{
 		if( n->p != NULL )
@@ -192,7 +194,7 @@ void Sniffer::processPacket( const pcap_pkthdr *header, const u_char *packet )
 	// TODO: if this throws exceptions, unlock pb_mutex before rethrow.
 	// So far, PacketBuffer doesn't throw any exceptions here.
 	pb->pushPacket(n);
-	
+
 	assert( pthread_mutex_unlock(&pb_mutex) == 0 );
 }
 
@@ -203,10 +205,10 @@ void Sniffer::processPacket( const pcap_pkthdr *header, const u_char *packet )
 void *sniffer_thread_func(void *arg)
 {
 	Sniffer *sniffer = (Sniffer *) arg;
-	try 
+	try
 	{
 		sniffer->run();
-	} 
+	}
 	catch( const AppError &e )
 	{
 		app->fatal(e.msg());
@@ -220,4 +222,3 @@ void handle_packet(u_char *other, const struct pcap_pkthdr *header, const u_char
 	Sniffer *sniffer = (Sniffer *) other;
 	sniffer->processPacket(header,packet);
 }
-

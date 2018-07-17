@@ -55,6 +55,9 @@ void TCPTrack::run( int argc, char **argv )
 		pthread_cond_wait(&quitflag,&quitflag_mutex);
 		pthread_mutex_unlock(&quitflag_mutex);
 
+		/* Print the tcp_sessions */
+		std::cout<<"reached end"<<endl;
+
 		// if an exception happened in another thread, it will be passed
 		// to us via the fatal() method, which puts the error in string
 		// form in this ferr variable.
