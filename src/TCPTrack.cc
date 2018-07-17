@@ -81,7 +81,7 @@ void TCPTrack::run( int argc, char **argv )
 			else if( ic->getState() == TCP_STATE_RESET )
 				tcp_state = "RESET";
 
-			std::cout<<std::setw(15)<<std::right<<ic->srcAddr().ptr()<<":"<<std::setw(5)<<std::left<<ic->srcPort()<<" <-> "<<std::setw(15)<<std::right<<ic->dstAddr().ptr()<<":"<<std::setw(5)<<std::left<<ic->dstPort()<<":"<<tcp_state<<endl;
+			std::cout<<std::setw(15)<<std::right<<ic->srcAddr().ptr()<<":"<<std::setw(5)<<std::left<<ic->srcPort()<<"  <->"<<std::setw(15)<<std::right<<ic->dstAddr().ptr()<<":"<<std::setw(5)<<std::left<<ic->dstPort()<<":"<<tcp_state<<endl;
 			//printw("%s:%d", ic->srcAddr().ptr(), ic->srcPort() );
 
 			//printw("%s:%d", ic->dstAddr().ptr(), ic->dstPort());
