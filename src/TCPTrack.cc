@@ -57,6 +57,35 @@ void TCPTrack::run( int argc, char **argv )
 
 		/* Print the tcp_sessions */
 		std::cout<<"reached end"<<endl;
+		SortedIterator *i = c->getSortedIteratorPtr();
+		/* TODO: move this to a new function */
+		while( TCPConnection *ic=i->getNext() )
+		{
+			if ((ic->getState() == TCP_STATE_CLOSED || ic->getState() == TCP_STATE_RESET)
+					&& (time(NULL) - ic->getLastPktTimestamp() > app->remto ))
+			{
+				continue;
+			}
+			std::cout<<ic->srcAddr().ptr()<<":"<<ic->srcPort()<<"<->"<<ic->dstAddr().ptr()<<":"<<ic->dstPort()<<endl;
+			//printw("%s:%d", ic->srcAddr().ptr(), ic->srcPort() );
+
+			//printw("%s:%d", ic->dstAddr().ptr(), ic->dstPort());
+			#if 0
+			if( ic->getState() == TCP_STATE_SYN_SYNACK )
+				printw("SYN_SENT");
+			else if( ic->getState() == TCP_STATE_SYNACK_ACK )
+				printw("SYN|ACK-ACK");
+			else if( ic->getState() == TCP_STATE_UP )
+				printw("ESTABLISHED");
+			else if( ic->getState() == TCP_STATE_FIN_FINACK )
+				printw("CLOSING");
+			else if( ic->getState() == TCP_STATE_CLOSED )
+				printw("CLOSED");
+			else if( ic->getState() == TCP_STATE_RESET )
+				printw("RESET");
+			#endif
+		}
+
 
 		// if an exception happened in another thread, it will be passed
 		// to us via the fatal() method, which puts the error in string
