@@ -61,12 +61,26 @@ void TCPTrack::run( int argc, char **argv )
 		/* TODO: move this to a new function */
 		while( TCPConnection *ic=i->getNext() )
 		{
+			string tcp_state;
 			if ((ic->getState() == TCP_STATE_CLOSED || ic->getState() == TCP_STATE_RESET)
 					&& (time(NULL) - ic->getLastPktTimestamp() > app->remto ))
 			{
 				continue;
 			}
-			std::cout<<ic->srcAddr().ptr()<<":"<<ic->srcPort()<<"<->"<<ic->dstAddr().ptr()<<":"<<ic->dstPort()<<endl;
+			if( ic->getState() == TCP_STATE_SYN_SYNACK )
+				tcp_state = "SYN_SENT";
+			else if( ic->getState() == TCP_STATE_SYNACK_ACK )
+				tcp_state = "SYN|ACK-ACK";
+			else if( ic->getState() == TCP_STATE_UP )
+				tcp_state = "ESTABLISHED";
+			else if( ic->getState() == TCP_STATE_FIN_FINACK )
+				tcp_state = "CLOSING";
+			else if( ic->getState() == TCP_STATE_CLOSED )
+				tcp_state = "CLOSED";
+			else if( ic->getState() == TCP_STATE_RESET )
+				tcp_state = "RESET";
+
+			std::cout<<ic->srcAddr().ptr()<<":"<<ic->srcPort()<<"<->"<<ic->dstAddr().ptr()<<":"<<ic->dstPort()<<":"<<tcp_state<<endl;
 			//printw("%s:%d", ic->srcAddr().ptr(), ic->srcPort() );
 
 			//printw("%s:%d", ic->dstAddr().ptr(), ic->dstPort());
@@ -84,6 +98,7 @@ void TCPTrack::run( int argc, char **argv )
 			else if( ic->getState() == TCP_STATE_RESET )
 				printw("RESET");
 			#endif
+
 		}
 
 
