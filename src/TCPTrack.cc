@@ -57,7 +57,7 @@ void TCPTrack::run( int argc, char **argv )
 		pthread_mutex_unlock(&quitflag_mutex);
 
 		/* Print the tcp_sessions */
-		std::cout<<"reached end"<<endl;
+		std::cout<<"TCP Sessions"<<endl;
 		SortedIterator *i = c->getSortedIteratorPtr();
 		/* TODO: move this to a new function */
 		while( TCPConnection *ic=i->getNext() )
@@ -81,7 +81,7 @@ void TCPTrack::run( int argc, char **argv )
 			else if( ic->getState() == TCP_STATE_RESET )
 				tcp_state = "RESET";
 
-			std::cout<<std::setw(15)<<ic->srcAddr().ptr()<<":"<<std::setw(5)<<std::left<<ic->srcPort()<<"<->"<<std::setw(15)<<std::right<<ic->dstAddr().ptr()<<":"<<std::setw(5)<<std::left<<ic->dstPort()<<":"<<tcp_state<<endl;
+			std::cout<<std::setw(15)<<std::right<<ic->srcAddr().ptr()<<":"<<std::setw(5)<<std::left<<ic->srcPort()<<" <-> "<<std::setw(15)<<std::right<<ic->dstAddr().ptr()<<":"<<std::setw(5)<<std::left<<ic->dstPort()<<":"<<tcp_state<<endl;
 			//printw("%s:%d", ic->srcAddr().ptr(), ic->srcPort() );
 
 			//printw("%s:%d", ic->dstAddr().ptr(), ic->dstPort());
