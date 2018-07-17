@@ -35,7 +35,7 @@ void TCPTrack::run( int argc, char **argv )
 	c = new TCContainer();
 	pb = new PacketBuffer();
 	s = new Sniffer();
-	ui = new TextUI(c);
+	//ui = new TextUI(c);
 
 	try
 	{
@@ -44,7 +44,7 @@ void TCPTrack::run( int argc, char **argv )
 
 		// init() on these objects performs constructor-like actions,
 		// only they may throw exceptions. Constructors don't.
-		ui->init();
+		//ui->init();
 		s->init(cf.iface,cf.fexp,cf.test_file);
 		pb->init();
 
@@ -64,7 +64,7 @@ void TCPTrack::run( int argc, char **argv )
 			throw GenericError(ferr);
 
 		// shut everything down cleanly.
-		ui->stop();
+		//ui->stop();
 		s->dest();
 		pb->dest();
 		c->stop();
@@ -79,14 +79,14 @@ void TCPTrack::run( int argc, char **argv )
 		s->dest();
 		pb->dest();
 
-		delete ui;
+		//delete ui;
 		delete s;
 		delete pb;
 		delete c;
 
 		// This tries to reset the terminal to a sane mode, in case
 		// TextUI couldn't do it cleanly.
-		TextUI::reset();
+		//TextUI::reset();
 
 		cout << e.msg() <<endl;
 	}
